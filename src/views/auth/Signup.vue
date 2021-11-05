@@ -97,11 +97,13 @@
             icon: "flaticon-app",
             api_key: "608d86be73ea8",
             username: "yote",
-            sender_id: "22136"
+            sender_id: "23107",
+            amount: "10",
+            charges: "1"
             }
           ]
         }
-        this.$store.dispatch('register', data)
+        this.$store.dispatch('AUTH_REGISTER', data)
        .then(() => this.$router.push('/login'))
        .catch(err => console.log(err))
       }

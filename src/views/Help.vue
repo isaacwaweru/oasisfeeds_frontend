@@ -7,7 +7,7 @@
           md="3" 
         >
           <div>
-           Good {{getGreetingTime(moment()) }} <strong>{{this.$store.state.user.firstname}}</strong>
+           Good {{getGreetingTime(moment()) }} <strong>{{ profile.firstname}}</strong>
         </div>
         </v-col>
         <v-col
@@ -32,12 +32,15 @@
                         <h5>Need support?</h5> 
                         Submit what you need
                         <v-text-field
+                        v-model="phonenumber"
                         class="mt-2"
                         label="Phone number"
                         placeholder="Phone number"
                         outlined
+                        type="number"
                     ></v-text-field>
                     <v-textarea
+                    v-model="helpmessage"
                     outlined
                     name="input-7-4"
                     label="Messaage..."
@@ -45,6 +48,7 @@
                     <v-btn
                         color="blue darken-1"
                         dark
+                        @click="sendHelp"
                         >
                         Submit
                         </v-btn>
@@ -56,6 +60,8 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
+
   export default {
     data: () => (
       { drawer: null,
@@ -70,7 +76,20 @@
           { title: 'Help', icon: 'flaticon-support' },
         ],
         right: null,
+        form: {
+          phone: '',
+          message: '',
+          api_key: '',
+          username: '',
+          sender_id: '',
+        },
+        helpmessage: '',
+        phonenumber: '',
       }),
+      computed : {
+      ...mapGetters(['getProfile', 'isProfileLoaded', 'isAuthenticated', 'getApps']),
+      ...mapState({ profile: state => state.user.profile })
+      },
        methods: {
         getGreetingTime (m) {
       var g = null; //return g
@@ -90,6 +109,14 @@
       }
       
       return g;
+    },
+    sendHelp: function () {
+      this.form.api_key = '608d86be73ea8',
+      this.form.username = 'yote',
+      this.form.sender_id = '23107',
+      this.form.phone = '254742842922',
+      this.form.message = this.helpmessage+ ' ' +this.phonenumber+ ' ' +this.getProfile.firstname,
+      this.$store.dispatch('SEND_SMS', this.form);
     }
       }
   }

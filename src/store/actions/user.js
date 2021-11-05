@@ -1,0 +1,11 @@
+export const USER_REQUEST = "USER_REQUEST";
+export const USER_SUCCESS = "USER_SUCCESS";
+export const USER_ERROR = "USER_ERROR";
+export const APP_DETAILS = "APP_DETAILS";
+export const APP_KEY = "APP_KEY";
+export const APP_KEY_STORE = "APP_KEY_STORE";
+export const APP_SUCCESS = "APP_SUCCESS";
+export const SEND_SMS = "SEND_SMS";
+export const SENT_SMS = "SENT_SMS";
+export const ADD_APP = "ADD_APP";
+export const APP_ADDED = "APP_ADDED";

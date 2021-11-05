@@ -139,20 +139,25 @@
     <v-app-bar elevation="1" app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>oasisFeeds</v-toolbar-title>
+      <v-toolbar-title>App: <strong>{{ app.app_name }}</strong></v-toolbar-title>
 
       <v-spacer></v-spacer>
       <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
-            <v-app-bar-nav-icon v-bind="attrs"
-              v-on="on"></v-app-bar-nav-icon>
+            <v-icon
+              v-bind="attrs"
+              v-on="on"
+              right
+            >
+              mdi-account
+            </v-icon>
           </template>
           <v-list>
             <v-list-item>
-              <v-list-item-title><div>{{this.$store.state.user.firstname}}</div></v-list-item-title>
+              <v-list-item-title><div>{{ profile.firstname}}</div></v-list-item-title>
             </v-list-item>
             <v-list-item>
-              <v-list-item-title><span v-if="isLoggedIn"><a @click="logout">Logout</a></span></v-list-item-title>
+              <v-list-item-title><span v-if="isAuthenticated"><a @click="logout">Logout</a></span></v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -165,7 +170,13 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
+
   export default {
+    mounted() {
+    this.paramID();
+    this.getApp();
+  },
     data: () => (
       { drawer: null,
         items: [
@@ -181,15 +192,23 @@
         right: null,
       }),
        computed : {
-      isLoggedIn : function(){ return this.$store.getters.isLoggedIn}
+      ...mapGetters(['getProfile', 'isProfileLoaded', 'isAuthenticated', 'getApps', 'getKey', 'getApp']),
+      ...mapState({ profile: state => state.user.profile }),
+      ...mapState({ app: state => state.user.app }),
+       getApp: function () {
+        return this.$store.dispatch('APP_DETAILS', this.getKey);
+      }
     },
     methods: {
       logout: function () {
-        this.$store.dispatch('logout')
+        this.$store.dispatch('AUTH_LOGOUT')
         .then(() => {
           this.$router.push('/login')
         })
-      }
+      },
+      paramID: function () {
+        this.$store.dispatch('APP_KEY', this.$route.params.id);
+      },
     },
   }
 </script>

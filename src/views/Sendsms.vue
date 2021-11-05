@@ -7,7 +7,7 @@
           md="3" 
         >
           <div>
-           Good {{getGreetingTime(moment()) }} <strong>{{this.$store.state.user.firstname}}</strong>
+           Good {{getGreetingTime(moment()) }} <strong>{{ profile.firstname}}</strong>
         </div>
         </v-col>
         <v-col
@@ -23,7 +23,7 @@
           <v-icon left>
             flaticon-wallet-filled-money-tool
           </v-icon>
-          KES 2,000
+          KES {{ getApp.amount }}
         </v-chip>
         </v-col>
       </v-row>
@@ -49,19 +49,16 @@
                         <v-container>
                             <h4>Individual</h4>
                             <v-text-field
-                                v-model="name"
-                                :error-messages="nameErrors"
-                                :counter="10"
+                                v-model="form.phone"
                                 label="Phone number"
                                 required
-                                @input="$v.name.$touch()"
-                                @blur="$v.name.$touch()"
                                 ></v-text-field>
                                 <v-btn
                                     class="mx-1"
                                     small
                                     dark
                                     color="indigo"
+                                    @click.stop="dialog = true"
                                     >
                                     <v-icon dark>
                                         mdi-plus
@@ -105,6 +102,7 @@
                     outlined
                     name="input-7-4"
                     label="Messaage..."
+                    v-model="form.message"
                     ></v-textarea>
                     <v-row justify="center">
                         <v-col
@@ -113,6 +111,7 @@
                             <v-btn
                             color="blue"
                             dark
+                            @click="sendSms"
                             >
                             <v-icon left>
                                 mdi-send
@@ -127,6 +126,7 @@
                             <v-btn
                             color="orange darken-2"
                             dark
+                            @click.stop="dialog2 = true"
                             >
                             <v-icon left>
                                 mdi-calendar
@@ -141,19 +141,82 @@
               </v-row>
           </v-card>
       </v-container>
+      <!-- Dialoag -->
+      <v-row justify="center">
+    <v-dialog
+      v-model="dialog"
+      max-width="330"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Seperate phonenumbers with comma(s) to send to many
+        </v-card-title>
+
+        <v-card-text>
+          Example 0722******56,0756******67,0789*******89
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="dialog = false"
+          >
+            Close
+          </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="dialog = false"
+          >
+            Okay
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </v-row>
+  <!-- Date picker -->
+  <v-row justify="center">
+    <v-dialog
+      v-model="dialog2"
+      max-width="330"
+    >
+      <v-date-picker
+      v-model="picker"
+      flat
+    ></v-date-picker>
+    <v-btn
+    color="blue darken-2"
+    dark
+    @click.stop="sendScheduled"
+    class="rounded-0"
+    >
+    Schedule Now
+    </v-btn>
+    </v-dialog>
+  </v-row>
     </v-app>
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
+
   export default {
     data: () => (
       { drawer: null,
+      dialog: false,
+      dialog2: false,
+      picker: null,
+      form: {
         message: '',
         phone: '',
         api_key: '',
         username: '',
         sender_id: '',
-        user_id: '',
+        },
         items: [
           { title: 'Dashboard', icon: 'flaticon-dashboard' },
           { title: 'Send SMS', icon: 'flaticon-paper-plane' },
@@ -166,6 +229,10 @@
         ],
         right: null,
       }),
+       computed : {
+      ...mapGetters(['getProfile', 'isProfileLoaded', 'isAuthenticated', 'getApps', 'getApp']),
+      ...mapState({ profile: state => state.user.profile })
+    },
       methods: {
         getGreetingTime (m) {
       var g = null; //return g
@@ -187,17 +254,13 @@
       return g;
     },
     sendSms(){
-      let data = {
-          mesaage: this.message,
-          phone: this.phone,
-          api_key: this.api_key,
-          username: this.username,
-          sender_id: this.sender_id,
-          user_id: this.user_id,
-        }
-      this.$store.dispatch('sendSingle', data)
-       .then(() => this.$router.push('/single'))
-       .catch(err => console.log(err))
+      this.form.api_key = this.getApp.api_key,
+      this.form.username = this.getApp.username,
+      this.form.sender_id = this.getApp.sender_id,
+      this.$store.dispatch('SEND_SMS', this.form);
+    },
+    sendScheduled(){
+      console.log(this.picker);
     }
       }
   }

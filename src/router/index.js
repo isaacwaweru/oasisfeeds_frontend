@@ -17,79 +17,101 @@ import Signup from '../views/auth/Signup.vue'
 
 Vue.use(VueRouter)
 
+const ifNotAuthenticated = (to, from, next) => {
+  if (!store.getters.isAuthenticated) {
+    next();
+    return;
+  }
+  next("/");
+};
+
+const ifAuthenticated = (to, from, next) => {
+  if (store.getters.isAuthenticated) {
+    next();
+    return;
+  }
+  next("/login");
+};
+
 const routes = [
   {
     path: '/',
     name: 'Landing',
     component: Landing,
-    meta: {
-      requiresAuth: true
-    }
+    beforeEnter: ifAuthenticated,
   },
   {
     path: '/about',
     name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: () => import('../views/About.vue')
   },
   {
     path: '/main',
     name: 'Main',
     component: Main,
+    beforeEnter: ifAuthenticated,
     children: [
       {
         path: '/dashboard',
         name: 'Dashboard',
-        component: Dashboard
+        component: Dashboard,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/send',
         name: 'SendSMS',
-        component: SendSMS
+        component: SendSMS,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/sent',
         name: 'SentSMS',
-        component: SentSMS
+        component: SentSMS,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/outbox',
         name: 'Outbox',
-        component: Outbox
+        component: Outbox,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/drafts',
         name: 'Drafts',
-        component: Drafts
+        component: Drafts,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/topup',
         name: 'TopUp',
-        component: TopUp
+        component: TopUp,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/contacts',
         name: 'Contacts',
-        component: Contacts
+        component: Contacts,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/help',
         name: 'Help',
-        component: Help
+        component: Help,
+        beforeEnter: ifAuthenticated,
       },
     ]
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    beforeEnter: ifNotAuthenticated
   },
   {
     path: '/signup',
     name: 'Signup',
-    component: Signup
+    component: Signup,
+    beforeEnter: ifNotAuthenticated
   },
 ]
 
@@ -99,16 +121,16 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.getters.isLoggedIn) {
-      next()
-      return
-    }
-    next('/login')
-  } else {
-    next()
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   if(to.matched.some(record => record.meta.requiresAuth)) {
+//     if (store.getters.isLoggedIn) {
+//       next()
+//       return
+//     }
+//     next('/login')
+//   } else {
+//     next()
+//   }
+// })
 
 export default router

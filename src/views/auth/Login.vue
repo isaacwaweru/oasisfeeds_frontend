@@ -18,6 +18,7 @@
                         placeholder="Email"
                         outlined
                         v-model="email"
+                        type="email"
                     ></v-text-field>
                         Password
                         <v-text-field
@@ -26,6 +27,7 @@
                         placeholder="Password"
                         outlined
                         v-model="password"
+                        type="password"
                     ></v-text-field>
                     <v-container>
                         Don't have an account yet? <router-link to="/signup">Register now</router-link>
@@ -37,6 +39,9 @@
                         >
                         Login
                         </v-btn>
+                    </v-container>
+                    <v-container>
+                    <router-link to="/signup">Forgot password?</router-link>
                     </v-container>
                     </form>
                 </v-card>
@@ -55,6 +60,8 @@ a {
 </style>
 
 <script>
+// import { AUTH_REQUEST } from "actions/auth";
+
   export default {
     data(){
       return {
@@ -63,13 +70,12 @@ a {
       }
     },
     methods: {
-      login: function () {
-        let email = this.email
-        let password = this.password
-        this.$store.dispatch('login', { email, password })
-       .then(() => this.$router.push('/dashboard'))
-       .catch(err => console.log(err))
-      }
+      login: function() {
+      const { email, password } = this;
+      this.$store.dispatch('AUTH_REQUEST', { email, password }).then(() => {
+        this.$router.push("/");
+      });
+    }
     }
   }
 </script>

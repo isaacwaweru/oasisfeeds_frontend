@@ -7,7 +7,7 @@
           md="3" 
         >
           <div>
-           Good {{getGreetingTime(moment()) }} <strong>{{this.$store.state.user.firstname}}</strong>
+           Good {{getGreetingTime(moment()) }} <strong>{{ profile.firstname }}</strong>
         </div>
         </v-col>
         <v-col
@@ -23,7 +23,7 @@
           <v-icon left>
             flaticon-wallet-filled-money-tool
           </v-icon>
-          KES 2,000
+          KES {{ getApp.amount }}
         </v-chip>
         </v-col>
       </v-row>
@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex'
+
   export default {
     data: () => (
       { drawer: null,
@@ -144,6 +146,10 @@
           },
         ],
       }),
+      computed : {
+      ...mapGetters(['getProfile', 'isProfileLoaded', 'isAuthenticated', 'getApps', 'getApp']),
+      ...mapState({ profile: state => state.user.profile })
+    },
       methods: {
         getGreetingTime (m) {
       var g = null; //return g
